@@ -1,0 +1,515 @@
+[
+  {
+    "position": 0,
+    "metadata": {
+      "source": "specialties",
+      "id": 1,
+      "specialty_name": "Bệnh lý huyết học, ung thư huyết học - Bệnh hiếm"
+    },
+    "text_preview": "Bệnh lý huyết học, ung thư huyết học - Bệnh hiếm bệnh-lý-huyết-học-ung-thư-huyết-học-bệnh-hiếm Mikael Hartman,Nguyễn Thị Nga Bệnh lý Vú - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Khoa Nội Ung bướu - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 1,
+    "metadata": {
+      "source": "specialties",
+      "id": 2,
+      "specialty_name": "Can thiệp mạch não"
+    },
+    "text_preview": "Can thiệp mạch não can-thiệp-mạch-não Trần Nguyễn Tuấn Minh Bệnh viện Đa khoa Vinmec Đà Nẵng Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 2,
+    "metadata": {
+      "source": "specialties",
+      "id": 3,
+      "specialty_name": "Chẩn đoán hình ảnh"
+    },
+    "text_preview": "Chẩn đoán hình ảnh chẩn-đoán-hình-ảnh Bùi Văn Giang,Trần Như Tú Khoa Chẩn đoán hình ảnh - Bệnh viện Đa khoa Vinmec Smart City,Khoa Chẩn đoán hình ảnh - Bệnh viện Đa khoa Vinmec Đà Nẵng Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 3,
+    "metadata": {
+      "source": "specialties",
+      "id": 4,
+      "specialty_name": "Cơ xương khớp"
+    },
+    "text_preview": "Cơ xương khớp cơ-xương-khớp Nguyễn Thị Ngọc Lan,Phan Lệ Kim Chi Khoa Nội tổng hợp - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Khoa Khám bệnh & Nội khoa, Bệnh viện Đa khoa Vinmec Hải Phòng Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 4,
+    "metadata": {
+      "source": "specialties",
+      "id": 5,
+      "specialty_name": "Da liễu"
+    },
+    "text_preview": "Da liễu da-liễu Nguyễn Quang Lâm Khoa Khám bệnh & Nội khoa - Bệnh viện Đa khoa Quốc tế Vinmec Central Park Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 5,
+    "metadata": {
+      "source": "specialties",
+      "id": 6,
+      "specialty_name": "Di truyền y học"
+    },
+    "text_preview": "Di truyền y học di-truyền-y-học Lý Thị Thanh Hà,Nguyễn Hồng Thanh,Nguyễn Viết Nhân,Nguyễn Đình Dũng,Trần Thị Thanh Hương Khoa Di truyền Y học và Bệnh hiếm - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 6,
+    "metadata": {
+      "source": "specialties",
+      "id": 7,
+      "specialty_name": "Dinh dưỡng"
+    },
+    "text_preview": "Dinh dưỡng dinh-dưỡng Phạm Vân Thúy Khoa Nội tổng hợp - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 7,
+    "metadata": {
+      "source": "specialties",
+      "id": 8,
+      "specialty_name": "Dược"
+    },
+    "text_preview": "Dược dược Nguyễn Thị Mai Loan,Phan Quỳnh Lan Bệnh viện Đa khoa Vinmec Hải Phòng,Khoa Dược - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 8,
+    "metadata": {
+      "source": "specialties",
+      "id": 9,
+      "specialty_name": "Dị ứng miễn dịch lâm sàng"
+    },
+    "text_preview": "Dị ứng miễn dịch lâm sàng dị-ứng-miễn-dịch-lâm-sàng Nguyễn Văn Đĩnh Đơn nguyên Hô hấp - Dị ứng Miễn dịch lâm sàng - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 9,
+    "metadata": {
+      "source": "specialties",
+      "id": 10,
+      "specialty_name": "Gan - Mật - Tụy"
+    },
+    "text_preview": "Gan - Mật - Tụy gan-mật-tụy Lê Văn Thành,Nguyễn Tiến Quyết,Nguyễn Tấn Cường,Trần Thị Phương Thúy,Đào Đức Dũng Trung tâm Tiêu hóa - Gan mật - Tiết niệu - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Khoa Ngoại Tiêu hóa - Gan mật - Tiết niệu - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Khoa Ngoại tổng hợp - Bệnh viện Đa khoa Quốc tế Vinmec Central Park,Khoa Nội tổng hợp - Bệnh viện Đa khoa Quốc tế V"
+  },
+  {
+    "position": 10,
+    "metadata": {
+      "source": "specialties",
+      "id": 11,
+      "specialty_name": "Giải phẫu bệnh"
+    },
+    "text_preview": "Giải phẫu bệnh giải-phẫu-bệnh Lê Quang Vinh Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 11,
+    "metadata": {
+      "source": "specialties",
+      "id": 12,
+      "specialty_name": "Gây mê"
+    },
+    "text_preview": "Gây mê gây-mê Cao Thị Anh Đào,Vũ Thành Lâm Trung tâm Y học tái tạo & Trị liệu tế bào,Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 12,
+    "metadata": {
+      "source": "specialties",
+      "id": 13,
+      "specialty_name": "Gây mê - điều trị đau"
+    },
+    "text_preview": "Gây mê - điều trị đau gây-mê-điều-trị-đau Nguyễn Trung Thành,Philippe Macaire Khoa Gây mê Phẫu thuật - Bệnh viện Đa khoa Quốc tế Vinmec Central Park,Khoa Gây mê giảm đau - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 13,
+    "metadata": {
+      "source": "specialties",
+      "id": 14,
+      "specialty_name": "Hoá sinh"
+    },
+    "text_preview": "Hoá sinh hoá-sinh Lê Duy Cường Bệnh viện Đa khoa Vinmec Phú Quốc Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 14,
+    "metadata": {
+      "source": "specialties",
+      "id": 15,
+      "specialty_name": "Huyết học"
+    },
+    "text_preview": "Huyết học huyết-học Nguyễn Thị Thùy Dương,Nguyễn Đình Duy Bệnh viện Đa khoa Vinmec Smart City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 15,
+    "metadata": {
+      "source": "specialties",
+      "id": 16,
+      "specialty_name": "Huyết học - Truyền Máu"
+    },
+    "text_preview": "Huyết học - Truyền Máu huyết-học-truyền-máu Nguyễn Văn Hưng,Trương Công Duẩn Bệnh viện Đa khoa Quốc tế Vinmec Ocean Park 2,Khoa Xét nghiệm - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 16,
+    "metadata": {
+      "source": "specialties",
+      "id": 17,
+      "specialty_name": "Hồi sức - Cấp cứu"
+    },
+    "text_preview": "Hồi sức - Cấp cứu hồi-sức-cấp-cứu Lê Thị Minh Hương,Nguyễn Ngọc Tuyền,Nguyễn Đăng Tuân,Phùng Nam Lâm,Vũ Đức Định Khoa Cấp cứu - Vận chuyển Quốc tế - Bệnh viện Đa khoa Vinmec Nha Trang,Bệnh viện Đa khoa Vinmec Hạ Long,Bệnh viện Đa khoa Vinmec Smart City,Hệ thống Y tế Vinmec,Khoa Hồi sức cấp cứu - Bệnh viện Đa khoa Vinmec Phú Quốc Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 17,
+    "metadata": {
+      "source": "specialties",
+      "id": 18,
+      "specialty_name": "Hồi sức ngoại và Ghép tạng"
+    },
+    "text_preview": "Hồi sức ngoại và Ghép tạng hồi-sức-ngoại-và-ghép-tạng Dương Thị Hoan Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 18,
+    "metadata": {
+      "source": "specialties",
+      "id": 19,
+      "specialty_name": "Hỗ trợ sinh sản"
+    },
+    "text_preview": "Hỗ trợ sinh sản hỗ-trợ-sinh-sản Hồ Thị Thanh Tâm,Nguyễn Thị Xuyến,Phạm Bá Nha,Tô Minh Hương,Vũ Bích Phương Đơn vị hỗ trợ sinh sản Olea - Bệnh viện Đa khoa Vinmec Nha Trang,Trung tâm Sức khỏe phụ nữ - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 19,
+    "metadata": {
+      "source": "specialties",
+      "id": 20,
+      "specialty_name": "Khoa Phụ"
+    },
+    "text_preview": "Khoa Phụ khoa-phụ Nguyễn Thu Hoài,Đoàn Văn Nam,Đỗ Thị Ngọc Lan Trung tâm Sức khỏe phụ nữ - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 20,
+    "metadata": {
+      "source": "specialties",
+      "id": 21,
+      "specialty_name": "Khoa Sản"
+    },
+    "text_preview": "Khoa Sản khoa-sản Lê Nguyễn Trọng Nhân,Lê Thiện Thái,Nguyễn Duy Quang,Trần Ngọc Thanh Bệnh viện Đa khoa Vinmec Cần Thơ,Trung tâm Sức khỏe phụ nữ - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Khoa Sản phụ khoa - Bệnh viện Đa khoa Vinmec Smart City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 21,
+    "metadata": {
+      "source": "specialties",
+      "id": 22,
+      "specialty_name": "Khoa Vú"
+    },
+    "text_preview": "Khoa Vú khoa-vú Nguyễn Thu Hương Bệnh lý Vú - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 22,
+    "metadata": {
+      "source": "specialties",
+      "id": 23,
+      "specialty_name": "Khoa Y học bào thai"
+    },
+    "text_preview": "Khoa Y học bào thai khoa-y-học-bào-thai Đinh Thị Hiền Lê Trung tâm Sức khỏe phụ nữ - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 23,
+    "metadata": {
+      "source": "specialties",
+      "id": 24,
+      "specialty_name": "Khám sức khỏe tổng quát"
+    },
+    "text_preview": "Khám sức khỏe tổng quát khám-sức-khỏe-tổng-quát Lê Thị Hường Khoa Khám bệnh - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 24,
+    "metadata": {
+      "source": "specialties",
+      "id": 25,
+      "specialty_name": "Kiểm soát chất lượng"
+    },
+    "text_preview": "Kiểm soát chất lượng kiểm-soát-chất-lượng Trần Thị Thanh Huyền Phòng QC và Tiêu chuẩn Chất lượng Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 25,
+    "metadata": {
+      "source": "specialties",
+      "id": 26,
+      "specialty_name": "Mắt"
+    },
+    "text_preview": "Mắt mắt Trần Thị Nguyệt Thanh Trung tâm Mắt Vinmec-Alina, Bệnh viện ĐKQT Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 26,
+    "metadata": {
+      "source": "specialties",
+      "id": 27,
+      "specialty_name": "Nghiên cứu khoa học"
+    },
+    "text_preview": "Nghiên cứu khoa học nghiên-cứu-khoa-học Hoàng Minh Đức,Hoàng Thanh Vân,Lê Trần Ngoan,Thân Thị Trang Uyên,Đào Thị Mai Lan Viện nghiên cứu Tế bào gốc và Công nghệ gen Vinmec,Hệ thống Y tế Vinmec Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 27,
+    "metadata": {
+      "source": "specialties",
+      "id": 28,
+      "specialty_name": "Ngoại Thần kinh"
+    },
+    "text_preview": "Ngoại Thần kinh ngoại-thần-kinh Nguyễn Phi Bệnh viện Đa khoa Quốc tế Vinmec Central Park Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 28,
+    "metadata": {
+      "source": "specialties",
+      "id": 29,
+      "specialty_name": "Ngoại Tim mạch"
+    },
+    "text_preview": "Ngoại Tim mạch ngoại-tim-mạch Nguyễn Văn Phan Trung tâm Tim mạch - Bệnh viện Đa khoa Quốc tế Vinmec Central Park Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 29,
+    "metadata": {
+      "source": "specialties",
+      "id": 30,
+      "specialty_name": "Ngoại Tiêu hoá"
+    },
+    "text_preview": "Ngoại Tiêu hoá ngoại-tiêu-hoá Trần Mạnh Hùng Bệnh viện Đa khoa Vinmec Smart City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 30,
+    "metadata": {
+      "source": "specialties",
+      "id": 31,
+      "specialty_name": "Ngoại Ung bướu"
+    },
+    "text_preview": "Ngoại Ung bướu ngoại-ung-bướu Phạm Văn Bình Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 31,
+    "metadata": {
+      "source": "specialties",
+      "id": 32,
+      "specialty_name": "Ngoại chấn thương chỉnh hình"
+    },
+    "text_preview": "Ngoại chấn thương chỉnh hình ngoại-chấn-thương-chỉnh-hình Lưu Hồng Hải,Nguyễn Hữu Mạnh,Nguyễn Đức Hòa,Trần Trung Dũng,Vũ Tú Nam Bệnh viện Đa khoa Vinmec Hải Phòng,Bệnh viện Đa khoa Vinmec Hạ Long,Trung tâm Cơ xương khớp và Chấn thương chỉnh hình - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Bệnh viện Đa khoa Vinmec Smart City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 32,
+    "metadata": {
+      "source": "specialties",
+      "id": 33,
+      "specialty_name": "Ngoại nhi"
+    },
+    "text_preview": "Ngoại nhi ngoại-nhi Bùi Đức Hậu,Ngô Duy Minh Trung tâm Nhi - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 33,
+    "metadata": {
+      "source": "specialties",
+      "id": 34,
+      "specialty_name": "Ngân hàng mô"
+    },
+    "text_preview": "Ngân hàng mô ngân-hàng-mô Nguyễn Văn Tình Ngân hàng mô Vinmec Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 34,
+    "metadata": {
+      "source": "specialties",
+      "id": 35,
+      "specialty_name": "Nha khoa Thẩm mỹ"
+    },
+    "text_preview": "Nha khoa Thẩm mỹ nha-khoa-thẩm-mỹ Daniele De Pasca Trung tâm Vinmec View Dental - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 35,
+    "metadata": {
+      "source": "specialties",
+      "id": 36,
+      "specialty_name": "Nhi"
+    },
+    "text_preview": "Nhi nhi Huỳnh Thoại Loan,Nguyễn Thanh Liêm,Ninh Thị Ứng,Phạm Nhật An,Tiên Hạnh Nhi,Trần Ngọc Sơn,Đỗ Hoàng Hà,Đỗ Tuấn Vũ Khoa Nhi - Sơ sinh, Bệnh viện Đa khoa Quốc tế Vinmec Central Park,Trung tâm Y học tái tạo & Trị liệu tế bào,Trung tâm Nhi - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Bệnh viện Đa khoa Vinmec Hải Phòng,Bệnh viện Đa khoa Vinmec Smart City,Khoa Nhi - Sơ sinh - Bệnh viện Đa khoa Vi"
+  },
+  {
+    "position": 36,
+    "metadata": {
+      "source": "specialties",
+      "id": 37,
+      "specialty_name": "Nội Thần kinh"
+    },
+    "text_preview": "Nội Thần kinh nội-thần-kinh Tôn Thất Trí Dũng Khoa Khám bệnh & Nội khoa - Bệnh viện Đa khoa Vinmec Đà Nẵng Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 37,
+    "metadata": {
+      "source": "specialties",
+      "id": 38,
+      "specialty_name": "Nội Tim mạch"
+    },
+    "text_preview": "Nội Tim mạch nội-tim-mạch Lê Hữu Đồng,Quách Hữu Trung Khoa Khám bệnh & Nội khoa - Bệnh viện Đa khoa Vinmec Nha Trang,Bệnh viện Đa khoa Vinmec Đà Nẵng Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 38,
+    "metadata": {
+      "source": "specialties",
+      "id": 39,
+      "specialty_name": "Nội Tiêu hoá - Nội soi"
+    },
+    "text_preview": "Nội Tiêu hoá - Nội soi nội-tiêu-hoá-nội-soi Bùi Chí Nam Khoa Nội Tiêu hóa - Gan mật - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 39,
+    "metadata": {
+      "source": "specialties",
+      "id": 40,
+      "specialty_name": "Nội Ung bướu"
+    },
+    "text_preview": "Nội Ung bướu nội-ung-bướu Yi Hyeon Gyu Bệnh viện Đa khoa Quốc tế Vinmec Central Park Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 40,
+    "metadata": {
+      "source": "specialties",
+      "id": 41,
+      "specialty_name": "Nội nhi"
+    },
+    "text_preview": "Nội nhi nội-nhi Lê Thị Minh Hương,Nguyễn Thị Hoàn,Phùng Tuyết Lan Trung tâm Nhi - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 41,
+    "metadata": {
+      "source": "specialties",
+      "id": 42,
+      "specialty_name": "Nội tiết"
+    },
+    "text_preview": "Nội tiết nội-tiết Hoàng Đăng Mịch Khoa Khám bệnh & Nội khoa, Bệnh viện Đa khoa Vinmec Hải Phòng Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 42,
+    "metadata": {
+      "source": "specialties",
+      "id": 43,
+      "specialty_name": "Nội tổng quát"
+    },
+    "text_preview": "Nội tổng quát nội-tổng-quát Lương Văn Đến,Trương Ngọc Hải Bệnh viện Đa khoa Vinmec Cần Thơ,Khoa Khám bệnh & Nội khoa - Bệnh viện Đa khoa Quốc tế Vinmec Central Park Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 43,
+    "metadata": {
+      "source": "specialties",
+      "id": 44,
+      "specialty_name": "Phẫu thuật Tim Mạch - Lồng Ngực"
+    },
+    "text_preview": "Phẫu thuật Tim Mạch - Lồng Ngực phẫu-thuật-tim-mạch-lồng-ngực Hồ Thượng Dũng,Đặng Quang Huy Bệnh viện Đa khoa Quốc tế Vinmec Central Park,Bệnh viện Đa khoa Vinmec Smart City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 44,
+    "metadata": {
+      "source": "specialties",
+      "id": 45,
+      "specialty_name": "Phẫu thuật U xương và phần mềm"
+    },
+    "text_preview": "Phẫu thuật U xương và phần mềm phẫu-thuật-u-xương-và-phần-mềm Trần Văn Công,Trần Đức Thanh Trung tâm Cơ xương khớp và Chấn thương chỉnh hình - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 45,
+    "metadata": {
+      "source": "specialties",
+      "id": 46,
+      "specialty_name": "Phục hồi chức năng"
+    },
+    "text_preview": "Phục hồi chức năng phục-hồi-chức-năng Trần Hữu Đạt Bệnh viện Đa khoa Vinmec Smart City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 46,
+    "metadata": {
+      "source": "specialties",
+      "id": 47,
+      "specialty_name": "Sản phụ khoa"
+    },
+    "text_preview": "Sản phụ khoa sản-phụ-khoa Nguyễn Quốc Tuấn,Néang Chanh Ly,Thái Bằng,Tạ Quốc Bản,Võ Văn Đức,Đinh Thanh Hà,Đầu Thị Tuyết Nhung Trung tâm Sức khỏe phụ nữ - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Khoa Sản phụ khoa - Bệnh viện Đa khoa Vinmec Phú Quốc,Khoa Sản phụ khoa - Bệnh viện Đa khoa Vinmec Smart City,Khoa Sản phụ khoa - Bệnh viện Đa khoa Vinmec Đà Nẵng,Bệnh viện Đa khoa Vinmec Nha Trang,Khoa "
+  },
+  {
+    "position": 47,
+    "metadata": {
+      "source": "specialties",
+      "id": 48,
+      "specialty_name": "Sản xuất tế bào"
+    },
+    "text_preview": "Sản xuất tế bào sản-xuất-tế-bào Nguyễn Xuân Hưng,Đàm Thị Minh Phương Khối Sản xuất Tế bào, Trung tâm Công nghệ Cao Vinmec Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 48,
+    "metadata": {
+      "source": "specialties",
+      "id": 49,
+      "specialty_name": "Tai - Mũi - Họng"
+    },
+    "text_preview": "Tai - Mũi - Họng tai-mũi-họng Bùi Thế Anh,Nguyễn Hữu Dũng,Nguyễn Lê Hoa,Trần Thị Thu Hiền Bệnh viện Đa khoa Quốc tế Vinmec Times City,Bệnh viện Đa khoa Quốc tế Vinmec Central Park,Bệnh viện Đa khoa Vinmec Smart City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 49,
+    "metadata": {
+      "source": "specialties",
+      "id": 50,
+      "specialty_name": "Thần kinh"
+    },
+    "text_preview": "Thần kinh thần-kinh Trần Hoàng Ngọc Anh,Đồng Phạm Cường Khoa Ngoại tổng hợp - Bệnh viện Đa khoa Quốc tế Vinmec Central Park,Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 50,
+    "metadata": {
+      "source": "specialties",
+      "id": 51,
+      "specialty_name": "Tim mạch"
+    },
+    "text_preview": "Tim mạch tim-mạch Bùi Đức Phú,Khổng Nam Hương,Lê Thị Hoa,Lương Võ Quang Đăng,Nguyễn Hồng Sơn,Nguyễn Ngọc Quang,Nguyễn Quỳnh Hoa,Đoàn Quốc Hưng,Đoàn Đức Dũng,Đặng Thị Linh,Đỗ Tất Cường Hệ thống Y tế Vinmec,Bệnh viện Đa khoa Vinmec Smart City,Trung Tâm Tim Mạch - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Khoa Khám bệnh & Nội khoa - Bệnh viện Đa khoa Vinmec Phú Quốc,Khoa Khám bệnh - Bệnh viện Đa kh"
+  },
+  {
+    "position": 51,
+    "metadata": {
+      "source": "specialties",
+      "id": 52,
+      "specialty_name": "Tiêu hóa"
+    },
+    "text_preview": "Tiêu hóa tiêu-hóa Phạm Anh Vũ,Phạm Đức Huấn,Trương Đình Khôi Khoa Ngoại tổng hợp - Bệnh viện Đa khoa Vinmec Đà Nẵng,Trung tâm Tiêu hóa - Gan mật - Tiết niệu - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Bệnh viện Đa khoa Vinmec Nha Trang Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 52,
+    "metadata": {
+      "source": "specialties",
+      "id": 53,
+      "specialty_name": "Truyền nhiễm"
+    },
+    "text_preview": "Truyền nhiễm truyền-nhiễm Đỗ Duy Cường Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 53,
+    "metadata": {
+      "source": "specialties",
+      "id": 54,
+      "specialty_name": "Ung bướu - Xạ trị"
+    },
+    "text_preview": "Ung bướu - Xạ trị ung-bướu-xạ-trị Lê Ngọc Mây,Nguyễn Thị Thu Trang,Phạm Thị Việt Hương Trung tâm Ung bướu Vinmec - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Bệnh lý Vú - Bệnh viện Đa khoa Quốc tế Vinmec Times City,Bệnh viện Đa khoa Vinmec Smart City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 54,
+    "metadata": {
+      "source": "specialties",
+      "id": 55,
+      "specialty_name": "Vi sinh"
+    },
+    "text_preview": "Vi sinh vi-sinh Đoàn Mai Phương Khoa Xét nghiệm - Bệnh viện Đa khoa Quốc tế Vinmec Times City Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 55,
+    "metadata": {
+      "source": "specialties",
+      "id": 56,
+      "specialty_name": "Xét nghiệm"
+    },
+    "text_preview": "Xét nghiệm xét-nghiệm Nguyễn Thị Nữ,Đoàn Thị Hồng Hạnh Bệnh viện Đa khoa Vinmec Phú Quốc,Khoa Xét nghiệm - Bệnh viện Đa khoa Vinmec Hạ Long Chuyen khoa y te Vinmec"
+  },
+  {
+    "position": 56,
+    "metadata": {
+      "source": "specialties",
+      "id": 57,
+      "specialty_name": "Y học cổ truyền"
+    },
+    "text_preview": "Y học cổ truyền y-học-cổ-truyền Bùi Tiến Hưng,Chu Quốc Trường Bệnh viện Đa khoa Vinmec Smart City,Trung tâm Y Học Cổ Truyền Vinmec - Sao Phương Đông Chuyen khoa y te Vinmec"
+  }
+]
