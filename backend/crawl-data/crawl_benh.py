@@ -62,6 +62,28 @@ def crawl_page(char, page):
     return soup, items
 
 
+def extract_item_detail(item_soup):
+    title_el = item_soup.select_one("h2.title_detail_sick")
+    title = clean_text(title_el.get_text()) if title_el else ""
+
+    texts = []
+    body = item_soup.select_one(".body.collapsible-target")
+    if body:
+        seen = set()
+        for el in body.find_all(["p", "h3", "li"], recursive=True):
+            # If h3/li are wrapped inside a <p>, the <p> will capture them.
+            if el.name in {"h3", "li"} and el.find_parent("p"):
+                continue
+            txt = clean_text(el.get_text(separator=" ", strip=True))
+            if txt:
+                if txt in seen:
+                    continue
+                seen.add(txt)
+                texts.append(txt)
+
+    return {"title": title, "content": texts}
+
+
 def crawl_detail(url):
     logger.info("Fetch detail %s", url)
     resp = requests.get(url, headers=HEADERS, timeout=20)
@@ -71,7 +93,13 @@ def crawl_detail(url):
     if not section:
         # Fallback in case classes change or are partially missing
         section = soup.select_one("section.detail_sick")
-    return str(section) if section else ""
+    if not section:
+        return []
+
+    details = []
+    for item in section.select("div.content_detail_sick div.item_detial_sick"):
+        details.append(extract_item_detail(item))
+    return details
 
 
 def crawl_char(char):
@@ -97,9 +125,14 @@ def main():
     # Crawl each disease detail page to extract the section HTML
     for i, item in enumerate(results, 1):
         try:
-            item["detail_section_html"] = crawl_detail(item["url"])
+            item["detail_sections"] = crawl_detail(item["url"])
+            logger.info("Result %d/%d: %s | %s", i, len(results), item.get("title"), item.get("url"))
+            for sec in item["detail_sections"]:
+                logger.info("  Section: %s", sec.get("title"))
+                for line in sec.get("content", []):
+                    logger.info("    %s", line)
         except requests.RequestException:
-            item["detail_section_html"] = ""
+            item["detail_sections"] = []
             logger.warning("Failed detail %s", item["url"])
         time.sleep(0.6)
         if i % 50 == 0:
