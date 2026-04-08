@@ -66,7 +66,7 @@ Chọn **1 path yếu nhất** mà mình tìm được. Sketch trên giấy:
 
 Không cần đẹp. Cần rõ.
 
-!![Sketch](image-2.png)
+!![Sketch](2A202600284_PhuongHoangYen_sketch.jpg)
 
 ## Phần 4 — Share + vote (5 phút)
 
