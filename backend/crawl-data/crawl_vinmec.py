@@ -61,7 +61,7 @@ def main():
         all_rows.extend(rows)
         time.sleep(0.8)  # nhẹ nhàng với server
 
-    out_path = "/home/duckduck/dev/work/VinUni/Day06-AI-Product-Hackathon/vinmec_doctors.json"
+    out_path = "/home/duckduck/dev/work/VinUni/Day5-Hackathon-X2-C401/data/vinmec_doctors.json"
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(all_rows, f, ensure_ascii=False, indent=2)
 
