@@ -1,4 +1,4 @@
-from __future__ import annotations
+from _future_ import annotations
 
 import json
 import sqlite3
@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 from backend.model.agent.chat import DiseaseArticle, DiseaseRetrievalResult, RetrieveDiseaseInput
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(_file_).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
 	sys.path.append(str(PROJECT_ROOT))
 
@@ -153,7 +153,7 @@ def retrieve_disease_info(query: str, top_k: int = 3) -> str:
 		)
 		return result.model_dump_json(ensure_ascii=False)
 	
-if __name__ == "__main__":
+if _name_ == "_main_":
     print("--- Đang bắt đầu test Tool: retrieve_disease_info ---")
     
     # 1. Định nghĩa câu hỏi test (Query)
