@@ -1,15 +1,24 @@
 from langchain_core import tools
+import os
 import sqlite3
 from datetime import datetime
+from pathlib import Path
 
-DATA_DIR = "../../../data/medical_chatbot.db"
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "medical_chatbot.db"
+DATA_DIR = Path(os.getenv("MEDICAL_DB_PATH", str(DEFAULT_DB_PATH))).expanduser().resolve()
 
 
 # ======================
 # DB helper
 # ======================
 def get_connection():
-    return sqlite3.connect(DATA_DIR)
+    if not DATA_DIR.exists():
+        raise FileNotFoundError(
+            f"Booking database file not found: {DATA_DIR}. "
+            "Set MEDICAL_DB_PATH if your database is in a different location."
+        )
+    return sqlite3.connect(str(DATA_DIR))
 
 
 # ======================
@@ -77,7 +86,7 @@ def check_appointment(doctor_name: str, date: str, time_start: str) -> bool:
         return False
 
     try:
-        requested_dt = datetime.strptime(f"{date} {time_start}", "%Y-%m-%d %H:%M")
+        datetime.strptime(f"{date} {time_start}", "%Y-%m-%d %H:%M")
     except ValueError:
         return False
 

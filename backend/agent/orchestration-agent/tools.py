@@ -184,13 +184,12 @@ def _call_chat_query(query: str) -> DelegatedAgentCallResult:
 
 def _call_booking_query(query: str, conversation_id: str) -> DelegatedAgentCallResult:
     try:
-        from backend.agent.booking_agent.agent import BookingAgent
+        from backend.agent.booking_agent.agent import ask_booking_question
 
-        booking_agent = BookingAgent(enable_memory=True)
-        result = booking_agent.process(query=query, conversation_id=conversation_id)
+        result = ask_booking_question(question=query, conversation_id=conversation_id)
         payload = dict(getattr(result, "__dict__", {}))
         success = bool(payload.get("success", False))
-        answer = "Booking request processed."
+        answer = str(payload.get("answer") or "Booking request processed.")
         if payload.get("appointment_id"):
             answer = f"Booking success. appointment_id={payload['appointment_id']}"
         elif payload.get("error"):

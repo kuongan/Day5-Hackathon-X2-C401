@@ -10,6 +10,10 @@ from .medicine import (
 	MedicineQARequest,
 	MedicineQAResponse,
 )
+from .booking import (
+	BookingQARequest,
+	BookingQAResponse,
+)
 
 __all__ = [
 	"BaseAgentResult",
@@ -21,4 +25,6 @@ __all__ = [
 	"RetrieveDiseaseInput",
 	"MedicineQARequest",
 	"MedicineQAResponse",
+	"BookingQARequest",
+	"BookingQAResponse",
 ]

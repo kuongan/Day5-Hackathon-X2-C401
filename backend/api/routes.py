@@ -6,7 +6,7 @@ from types import ModuleType
 
 from fastapi import APIRouter, HTTPException
 
-from backend.agent.booking_agent.agent import BookingAgent
+from backend.agent.booking_agent.agent import ask_booking_question
 from backend.api.schemas import AgentQuestionRequest, BookingResponse
 from backend.model.agent.chat import DiseaseQAResponse
 from backend.model.agent.medicine import MedicineQAResponse
@@ -73,9 +73,8 @@ def ask_medicine(request: AgentQuestionRequest) -> MedicineQAResponse:
 @router.post("/booking", response_model=BookingResponse)
 def ask_booking(request: AgentQuestionRequest) -> BookingResponse:
     try:
-        booking_agent = BookingAgent(enable_memory=True)
-        result = booking_agent.process(
-            query=request.question,
+        result = ask_booking_question(
+            question=request.question,
             conversation_id=request.conversation_id,
         )
         payload = dict(getattr(result, "__dict__", {}))
