@@ -19,6 +19,7 @@ class IntentType(str, Enum):
 
 class IntentClassificationInput(BaseModel):
     query: str = Field(..., min_length=1, description="User query to classify")
+    context: Optional[str] = Field(default="", description="Short-term conversation context")
 
 
 class IntentClassificationResult(BaseModel):
@@ -31,6 +32,7 @@ class IntentClassificationResult(BaseModel):
 class RouteDecisionInput(BaseModel):
     query: str = Field(..., min_length=1)
     intent: IntentType
+    context: Optional[str] = Field(default="", description="Short-term conversation context")
 
 
 class RouteDecisionResult(BaseModel):
@@ -42,6 +44,7 @@ class RouteDecisionResult(BaseModel):
 class DelegatedAgentCallInput(BaseModel):
     query: str = Field(..., min_length=1)
     conversation_id: str = Field(default="default")
+    context: Optional[str] = Field(default="")
 
 
 class DelegatedAgentCallResult(BaseModel):

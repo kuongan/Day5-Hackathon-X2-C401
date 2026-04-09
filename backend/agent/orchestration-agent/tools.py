@@ -5,11 +5,11 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import re
 from pathlib import Path
 import sys
 from typing import Dict, List
 
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -27,6 +27,7 @@ from backend.model.agent.oschestration import (
     RouteDecisionInput,
     RouteDecisionResult,
 )
+from backend.utils.llm_manager import get_llm
 
 
 def _load_module(module_name: str, file_path: Path):
@@ -38,103 +39,129 @@ def _load_module(module_name: str, file_path: Path):
     return module
 
 
-def _normalize(text: str) -> str:
-    return re.sub(r"\s+", " ", text.strip().lower())
+INTENT_CLASSIFIER_SYSTEM_PROMPT = """
+Ban la bo phan phan loai intent cho mot he thong tro ly y te.
+
+Hay doc cau hoi nguoi dung va suy luan theo y nghia, khong dua vao keyword rule co dinh.
+
+Phan loai vao mot trong cac intent sau:
+- medicine: hoi ve thuoc, lieu dung, tac dung phu, chi dinh, chong chi dinh, tuong tac, cach dung
+- booking: dat lich kham, kiem tra lich, tim bac si, chon khung gio, hoan/huy lich
+- chat: Trả lời câu hỏi về cơ thể người và các bệnh, trieu chung, nguyen nhan, phong ngua, dieu tri, tu van suc khoe
+- multi: cau hoi can hon mot agent de tra loi day du
+- unknown: khong xac dinh duoc intent ro rang
+
+Tra ve confidence trong khoang 0-1 va reasons ngan gon, noi ro vi sao phan loai nhu vay.
+""".strip()
 
 
-def _count_keywords(query: str, keywords: List[str]) -> int:
-    score = 0
-    for word in keywords:
-        if word in query:
-            score += 1
-    return score
+ROUTER_SYSTEM_PROMPT = """
+Ban la bo phan route cho he thong tro ly y te.
+
+Nhiem vu: dua tren cau hoi nguoi dung va intent hien co, chon nhung agent can goi.
+Khong dung rule keyword co dinh. Hay route theo y nghia va muc do phu hop cua tung agent.
+
+Available agents:
+- medicine: tra loi ve thuoc, lieu dung, tac dung phu, chi dinh, chong chi dinh
+- booking: dat lich, tim bac si, kiem tra lich hen, xu ly khung gio
+- chat: hoi ve benh và cơ thể người, trieu chung, nguyen nhan, phong ngua, tu van y khoa, không dùng để trả lời trực tiếp câu hỏi về lịch hoặc thuốc.
+
+Quy tac:
+- Co the chon 1 hoac nhieu agent neu cau hoi phuc hop.
+- Neu intent hien co khong ro, van duoc phep route toi agent phu hop nhat theo nguyen van.
+- Khong de route_to rong neu van co the suy luan ra mot agent phu hop.
+
+Huong dan quan trong de tranh goi agent khong can thiet:
+- Neu user dua ra yeu cau hanh dong dat lich ro rang (vi du: "hay dat lich", "dat lich cho toi", "toi muon hen") thi uu tien booking.
+- Trong truong hop user nhac ten benh/chuan doan chi de mo ta ly do kham (vi du: "toi bi amidan, dat lich kham...") ma KHONG yeu cau giai thich y khoa, route_to nen chi la ["booking"].
+- Chi goi chat khi user co cau hoi thong tin y khoa that su (trieu chung, nguyen nhan, cach dieu tri, co nen lam gi, ...).
+- Chi goi medicine khi user hoi ve thuoc hoac lieu dung.
+
+Vi du:
+1) "Toi bi amidan, hay dat lich kham voi bac si Nguyen Thanh Liem ngay 12/4 luc 10h" -> route_to: ["booking"]
+2) "Toi bi amidan, trieu chung nao can di cap cuu?" -> route_to: ["chat"]
+3) "Toi bi amidan, dat lich kham va cho toi biet co nen dung paracetamol khong" -> route_to: ["booking", "medicine"]
+""".strip()
 
 
-def _intent_scores(query: str) -> Dict[IntentType, int]:
-    q = _normalize(query)
+def _build_structured_llm():
+    return get_llm(model_name="gpt-4o-mini", temperature=0.0)
 
-    medicine_keywords = [
-        "thuoc", "lieu", "dosage", "tac dung phu", "contra", "indication",
-        "aspirin", "paracetamol", "ibuprofen", "amoxicillin",
+
+def _safe_structured_invoke(prompt: str, schema, *, user_query: str, extra_context: str = ""):
+    llm = _build_structured_llm()
+    structured_llm = llm.with_structured_output(schema)
+    messages = [
+        SystemMessage(content=prompt),
+        HumanMessage(content=f"Cau hoi: {user_query}\n{extra_context}".strip()),
     ]
-    booking_keywords = [
-        "dat lich", "hen", "kham", "bac si", "doctor", "appointment", "lich",
-        "gio", "ngay", "slot",
-    ]
-    chat_keywords = [
-        "benh", "trieu chung", "nguyen nhan", "phong ngua", "dieu tri",
-        "sot xuat huyet", "tieu duong", "cao huyet ap", "viem",
-    ]
-
-    return {
-        IntentType.MEDICINE: _count_keywords(q, medicine_keywords),
-        IntentType.BOOKING: _count_keywords(q, booking_keywords),
-        IntentType.CHAT: _count_keywords(q, chat_keywords),
-    }
+    return structured_llm.invoke(messages)
 
 
 @tool(args_schema=IntentClassificationInput)
-def classify_intent(query: str) -> str:
-    """Classify user query into medicine, booking, chat, multi, or unknown."""
-    scores = _intent_scores(query)
-    non_zero = [intent for intent, score in scores.items() if score > 0]
-
-    if len(non_zero) == 0:
-        result = IntentClassificationResult(
+def classify_intent(query: str, context: str = "") -> str:
+    """Classify user query using semantic understanding, not keyword rules."""
+    try:
+        result = _safe_structured_invoke(
+            INTENT_CLASSIFIER_SYSTEM_PROMPT,
+            IntentClassificationResult,
+            user_query=query,
+            extra_context=str(context or "").strip(),
+        )
+        if isinstance(result, IntentClassificationResult):
+            result.query = query
+            return result.model_dump_json(ensure_ascii=False)
+    except Exception as exc:
+        fallback = IntentClassificationResult(
             query=query,
             intent=IntentType.UNKNOWN,
-            confidence=0.2,
-            reasons=["No clear keyword signal found"],
+            confidence=0.0,
+            reasons=[f"Intent classification failed: {exc}"],
         )
-        return result.model_dump_json(ensure_ascii=False)
+        return fallback.model_dump_json(ensure_ascii=False)
 
-    if len(non_zero) >= 2:
-        reasons = [f"{intent.value}: {scores[intent]}" for intent in non_zero]
-        result = IntentClassificationResult(
-            query=query,
-            intent=IntentType.MULTI,
-            confidence=0.75,
-            reasons=["Multiple intent groups matched"] + reasons,
-        )
-        return result.model_dump_json(ensure_ascii=False)
-
-    best_intent = max(scores, key=scores.get)
-    best_score = scores[best_intent]
-    total = sum(scores.values())
-    confidence = min(0.95, 0.5 + (best_score / max(total, 1)) * 0.45)
-
-    result = IntentClassificationResult(
+    fallback = IntentClassificationResult(
         query=query,
-        intent=best_intent,
-        confidence=confidence,
-        reasons=[f"Top score for {best_intent.value}: {best_score}"],
+        intent=IntentType.UNKNOWN,
+        confidence=0.0,
+        reasons=["Intent classification returned an unexpected response"],
     )
-    return result.model_dump_json(ensure_ascii=False)
+    return fallback.model_dump_json(ensure_ascii=False)
 
 
 @tool(args_schema=RouteDecisionInput)
-def route_request(query: str, intent: IntentType) -> str:
-    """Route user query to one or more delegated agents based on intent."""
-    if intent == IntentType.MEDICINE:
-        route_to = ["medicine"]
-    elif intent == IntentType.BOOKING:
-        route_to = ["booking"]
-    elif intent == IntentType.CHAT:
-        route_to = ["chat"]
-    elif intent == IntentType.MULTI:
-        route_to = ["medicine", "booking", "chat"]
-    else:
-        route_to = ["chat"]
+def route_request(query: str, intent: IntentType, context: str = "") -> str:
+    """Route user query to one or more delegated agents using semantic judgment."""
+    try:
+        result = _safe_structured_invoke(
+            ROUTER_SYSTEM_PROMPT,
+            RouteDecisionResult,
+            user_query=query,
+            extra_context=f"Intent hien tai: {intent.value}\n{str(context or '').strip()}",
+        )
+        if isinstance(result, RouteDecisionResult):
+            result.query = query
+            result.intent = intent if intent else IntentType.UNKNOWN
+            if not result.route_to:
+                result.route_to = ["chat"]
+            return result.model_dump_json(ensure_ascii=False)
+    except Exception as exc:
+        fallback = RouteDecisionResult(
+            query=query,
+            intent=intent,
+            route_to=["chat"],
+        )
+        return fallback.model_dump_json(ensure_ascii=False)
 
-    result = RouteDecisionResult(query=query, intent=intent, route_to=route_to)
-    return result.model_dump_json(ensure_ascii=False)
+    fallback = RouteDecisionResult(query=query, intent=intent, route_to=["chat"])
+    return fallback.model_dump_json(ensure_ascii=False)
 
 
-def _call_medicine_query(query: str) -> DelegatedAgentCallResult:
+def _call_medicine_query(query: str, conversation_id: str, memory_context: str = "") -> DelegatedAgentCallResult:
     try:
         medicine_agent_path = PROJECT_ROOT / "backend" / "agent" / "medicine-agent" / "agent.py"
         medicine_module = _load_module("medicine_agent_runtime", medicine_agent_path)
-        response = medicine_module.ask_medicine_question(query)
+        response = medicine_module.ask_medicine_question(query, conversation_id=conversation_id, memory_context=memory_context)
         return DelegatedAgentCallResult(
             agent="medicine",
             success=True,
@@ -156,11 +183,11 @@ def _call_medicine_query(query: str) -> DelegatedAgentCallResult:
         )
 
 
-def _call_chat_query(query: str) -> DelegatedAgentCallResult:
+def _call_chat_query(query: str, conversation_id: str, memory_context: str = "") -> DelegatedAgentCallResult:
     try:
         chat_agent_path = PROJECT_ROOT / "backend" / "agent" / "chat-agent" / "agent.py"
         chat_module = _load_module("chat_agent_runtime", chat_agent_path)
-        response = chat_module.ask_disease_question(query)
+        response = chat_module.ask_disease_question(query, conversation_id=conversation_id, memory_context=memory_context)
         return DelegatedAgentCallResult(
             agent="chat",
             success=True,
@@ -182,11 +209,19 @@ def _call_chat_query(query: str) -> DelegatedAgentCallResult:
         )
 
 
-def _call_booking_query(query: str, conversation_id: str) -> DelegatedAgentCallResult:
+def _call_medicine_query_with_context(query: str, memory_context: str = "") -> DelegatedAgentCallResult:
+    return _call_medicine_query(query, conversation_id="default", memory_context=memory_context)
+
+
+def _call_chat_query_with_context(query: str, memory_context: str = "") -> DelegatedAgentCallResult:
+    return _call_chat_query(query, conversation_id="default", memory_context=memory_context)
+
+
+def _call_booking_query(query: str, conversation_id: str, context: str = "") -> DelegatedAgentCallResult:
     try:
         from backend.agent.booking_agent.agent import ask_booking_question
 
-        result = ask_booking_question(question=query, conversation_id=conversation_id)
+        result = ask_booking_question(question=query, conversation_id=conversation_id, memory_context=context)
         payload = dict(getattr(result, "__dict__", {}))
         success = bool(payload.get("success", False))
         answer = str(payload.get("answer") or "Booking request processed.")
@@ -215,25 +250,25 @@ def _call_booking_query(query: str, conversation_id: str) -> DelegatedAgentCallR
 
 
 @tool(args_schema=DelegatedAgentCallInput)
-def call_medicine_agent(query: str, conversation_id: str = "default") -> str:
+def call_medicine_agent(query: str, conversation_id: str = "default", context: str = "") -> str:
     """Delegate a query to medicine agent and return structured JSON result."""
     _ = conversation_id
-    result = _call_medicine_query(query)
+    result = _call_medicine_query(query, conversation_id=conversation_id, memory_context=context)
     return result.model_dump_json(ensure_ascii=False)
 
 
 @tool(args_schema=DelegatedAgentCallInput)
-def call_chat_agent(query: str, conversation_id: str = "default") -> str:
+def call_chat_agent(query: str, conversation_id: str = "default", context: str = "") -> str:
     """Delegate a query to chat agent and return structured JSON result."""
     _ = conversation_id
-    result = _call_chat_query(query)
+    result = _call_chat_query(query, conversation_id=conversation_id, memory_context=context)
     return result.model_dump_json(ensure_ascii=False)
 
 
 @tool(args_schema=DelegatedAgentCallInput)
-def call_booking_agent(query: str, conversation_id: str = "default") -> str:
+def call_booking_agent(query: str, conversation_id: str = "default", context: str = "") -> str:
     """Delegate a query to booking agent and return structured JSON result."""
-    result = _call_booking_query(query, conversation_id)
+    result = _call_booking_query(query, conversation_id, context=context)
     return result.model_dump_json(ensure_ascii=False)
 
 
@@ -255,12 +290,8 @@ def aggregate_results(
     failed = [res for res in delegated_results if not res.success]
 
     lines: List[str] = []
-    lines.append(f"Yeu cau: {query}")
-    lines.append(f"Intent: {intent.value}")
-    lines.append(f"Route: {', '.join(route_to) if route_to else 'none'}")
 
     if successful:
-        lines.append("Ket qua chinh:")
         for item in successful:
             lines.append(f"- [{item.agent}] {item.answer}")
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+import unicodedata
 from typing import Any, Dict, List, Optional, Type
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -10,9 +12,66 @@ from openai import APIConnectionError
 from backend.agent.base_agent import BaseAgent
 from backend.model.agent.base import BaseAgentState
 from backend.model.agent.booking import BookingQARequest, BookingQAResponse
+from backend.utils.short_term_memory import get_short_term_context, record_turn
 
 from . import tools
 from .prompts import BOOKING_AGENT_PROMPT
+
+
+def _normalize_vietnamese_text(text: str) -> str:
+    normalized = unicodedata.normalize("NFD", text or "")
+    normalized = normalized.replace("đ", "d").replace("Đ", "D")
+    normalized = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+    return " ".join(normalized.lower().split())
+
+
+def _extract_booking_details(question: str) -> Dict[str, str]:
+    normalized_question = _normalize_vietnamese_text(question)
+
+    date_match = re.search(r"\b(\d{4}-\d{2}-\d{2})\b", normalized_question)
+    time_match = re.search(r"\b(\d{1,2}:\d{2})\b", normalized_question)
+
+    doctor_name = ""
+    doctor_match = re.search(
+        r"(?:voi\s+)?bac\s+si\s+(.+?)(?:\s+vao\s+ngay\s+|\s+vao\s+|\s+luc\s+|\s+ngay\s+\d|$)",
+        normalized_question,
+    )
+    if doctor_match:
+        doctor_name = doctor_match.group(1).strip()
+
+    return {
+        "doctor_name": doctor_name,
+        "date": date_match.group(1) if date_match else "",
+        "time_start": time_match.group(1) if time_match else "",
+    }
+
+
+def _fill_from_memory(details: Dict[str, str], memory_context: str) -> Dict[str, str]:
+    if not memory_context:
+        return details
+
+    normalized_memory = _normalize_vietnamese_text(memory_context)
+    if not details.get("doctor_name"):
+        doctor_match = re.search(
+            r"(?:bac\s+si\s+)?([a-z0-9\s.-]{3,60})",
+            normalized_memory,
+        )
+        if doctor_match:
+            candidate = doctor_match.group(1).strip()
+            if candidate and len(candidate.split()) >= 2:
+                details["doctor_name"] = candidate
+
+    if not details.get("date"):
+        date_match = re.search(r"\b(\d{4}-\d{2}-\d{2})\b", normalized_memory)
+        if date_match:
+            details["date"] = date_match.group(1)
+
+    if not details.get("time_start"):
+        time_match = re.search(r"\b(\d{1,2}:\d{2})\b", normalized_memory)
+        if time_match:
+            details["time_start"] = time_match.group(1)
+
+    return details
 
 
 class BookingAgentState(BaseAgentState):
@@ -63,9 +122,14 @@ class BookingAgent(BaseAgent[BookingAgentState]):
     def _add_agent_context(self, messages: List[BaseMessage], state: BookingAgentState) -> List[BaseMessage]:
         if messages and getattr(messages[0], "type", "") == "system":
             return messages
-        return [SystemMessage(content=self._get_agent_prompt())] + messages
+        metadata = dict(state.get("metadata") or {})
+        memory_context = str(metadata.get("memory_context") or "").strip()
+        system_prompt = self._get_agent_prompt()
+        if memory_context:
+            system_prompt = f"{system_prompt}\n\n{memory_context}"
+        return [SystemMessage(content=system_prompt)] + messages
 
-    def _preprocess_tool_args(self, tool_args: Dict[str, Any], state: BookingAgentState) -> Dict[str, Any]:
+    def _preprocess_tool_args(self, tool_args: Dict[str, Any], state: BookingAgentState, tool_name: str | None = None) -> Dict[str, Any]:
         if "doctor_name" not in tool_args and state.get("doctor_name"):
             tool_args["doctor_name"] = state["doctor_name"]
         if "date" not in tool_args and state.get("date"):
@@ -121,13 +185,43 @@ def build_booking_agent(model_name: str = "gpt-4o-mini", temperature: float = 0.
 
 
 @traceable(name="ask_booking_question")
-def ask_booking_question(question: str, conversation_id: str = "default") -> BookingQAResponse:
+def ask_booking_question(question: str, conversation_id: str = "default", memory_context: str = "") -> BookingQAResponse:
     request = BookingQARequest(question=question, conversation_id=conversation_id)
     try:
+        effective_memory_context = memory_context or get_short_term_context(conversation_id)
+        booking_details = _extract_booking_details(request.question)
+        booking_details = _fill_from_memory(booking_details, effective_memory_context)
+        if booking_details["doctor_name"] and booking_details["date"] and booking_details["time_start"]:
+            direct_result = tools.create_appointment.invoke(booking_details)
+            if isinstance(direct_result, dict) and direct_result.get("id"):
+                response = BookingQAResponse(
+                    success=True,
+                    answer=(
+                        f"Lich hen kham voi bac si {direct_result.get('doctor_name', booking_details['doctor_name'])} "
+                        f"vao ngay {direct_result.get('date', booking_details['date'])} luc {direct_result.get('time_start', booking_details['time_start'])} "
+                        "da duoc dat thanh cong."
+                    ),
+                    appointment_id=int(direct_result["id"]),
+                    appointment_details=direct_result,
+                    error=None,
+                )
+                record_turn(conversation_id, request.question, response.answer, metadata={"agent": "booking", **direct_result})
+                return response
+
         agent = build_booking_agent()
-        return agent.process(query=request.question, conversation_id=request.conversation_id)
+        result = agent.process(
+            query=request.question,
+            conversation_id=request.conversation_id,
+            memory_context=effective_memory_context,
+        )
+        if result.success and result.appointment_id:
+            record_turn(conversation_id, request.question, result.answer, metadata={"agent": "booking", "appointment_id": result.appointment_id})
+            return result
+
+        record_turn(conversation_id, request.question, result.answer, metadata={"agent": "booking", "success": result.success})
+        return result
     except APIConnectionError as exc:
-        return BookingQAResponse(
+        response = BookingQAResponse(
             success=False,
             answer=(
                 "Khong the ket noi den OpenAI de xu ly yeu cau dat lich hien tai. "
@@ -137,14 +231,18 @@ def ask_booking_question(question: str, conversation_id: str = "default") -> Boo
             appointment_details=None,
             error=str(exc),
         )
+        record_turn(conversation_id, request.question, response.answer, metadata={"agent": "booking", "error": str(exc)})
+        return response
     except Exception as exc:
-        return BookingQAResponse(
+        response = BookingQAResponse(
             success=False,
             answer=f"Khong the xu ly yeu cau dat lich hien tai. Chi tiet: {exc}",
             appointment_id=None,
             appointment_details=None,
             error=str(exc),
         )
+        record_turn(conversation_id, request.question, response.answer, metadata={"agent": "booking", "error": str(exc)})
+        return response
 
 
 if __name__ == "__main__":

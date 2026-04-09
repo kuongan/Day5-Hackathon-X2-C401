@@ -56,7 +56,7 @@ def health_check() -> dict[str, str]:
 def ask_chat(request: AgentQuestionRequest) -> DiseaseQAResponse:
     try:
         module = _chat_module()
-        return module.ask_disease_question(request.question)
+        return module.ask_disease_question(request.question, conversation_id=request.conversation_id)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Chat agent failed: {exc}") from exc
 
@@ -65,7 +65,7 @@ def ask_chat(request: AgentQuestionRequest) -> DiseaseQAResponse:
 def ask_medicine(request: AgentQuestionRequest) -> MedicineQAResponse:
     try:
         module = _medicine_module()
-        return module.ask_medicine_question(request.question)
+        return module.ask_medicine_question(request.question, conversation_id=request.conversation_id)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Medicine agent failed: {exc}") from exc
 

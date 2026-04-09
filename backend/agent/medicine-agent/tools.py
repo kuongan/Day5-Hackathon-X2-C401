@@ -183,7 +183,7 @@ def get_drug_info(name: str, top_k: int = 5) -> str:
 		score_map = {medicine_id: score for medicine_id, score in ranked}
 		candidate_ids = [medicine_id for medicine_id, _ in ranked]
 
-		medicines = _query_medicines_by_ids(candidate_ids=candidate_ids, score_map=score_map)
+		medicines = _query_medicines_by_ids(medicine_ids=candidate_ids, score_map=score_map)
 		result = MedicineRetrievalResult(
 			query=name,
 			total_hits=len(medicines),

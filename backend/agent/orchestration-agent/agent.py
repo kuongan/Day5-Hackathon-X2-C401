@@ -25,6 +25,7 @@ from backend.model.agent.oschestration import (
     OrchestrationRequest,
     OrchestrationResponse,
 )
+from backend.utils.short_term_memory import get_short_term_context, record_turn
 
 CURRENT_DIR = Path(__file__).resolve().parent
 
@@ -86,12 +87,13 @@ class OrchestrationAgent(BaseAgent[BaseAgentState]):
         return SYSTEM_PROMPT
 
     def _create_initial_state(self, query: str, conversation_id: str) -> BaseAgentState:
+        memory_context = get_short_term_context(conversation_id)
         return {
             "messages": [HumanMessage(content=query)],
             "user_query": query,
             "agent_type": self.agent_name,
             "conversation_id": conversation_id,
-            "metadata": {"orchestration": {}},
+            "metadata": {"orchestration": {"memory_context": memory_context}},
             "error": None,
         }
 
@@ -101,7 +103,25 @@ class OrchestrationAgent(BaseAgent[BaseAgentState]):
     def _add_agent_context(self, messages: List[BaseMessage], state: BaseAgentState) -> List[BaseMessage]:
         if messages and getattr(messages[0], "type", "") == "system":
             return messages
-        return [SystemMessage(content=self._get_agent_prompt())] + messages
+        metadata = dict(state.get("metadata") or {})
+        orchestration = dict(metadata.get("orchestration") or {})
+        memory_context = str(orchestration.get("memory_context") or "").strip()
+        system_prompt = self._get_agent_prompt()
+        if memory_context:
+            system_prompt = f"{system_prompt}\n\n{memory_context}"
+        return [SystemMessage(content=system_prompt)] + messages
+
+    def _preprocess_tool_args(self, tool_args: Dict[str, Any], state: BaseAgentState, tool_name: str | None = None) -> Dict[str, Any]:
+        metadata = dict(state.get("metadata") or {})
+        orchestration = dict(metadata.get("orchestration") or {})
+        memory_context = str(orchestration.get("memory_context") or "").strip()
+
+        if tool_name in {"classify_intent", "route_request", "call_medicine_agent", "call_booking_agent", "call_chat_agent"} and memory_context:
+            tool_args = dict(tool_args)
+            tool_args.setdefault("context", memory_context)
+            tool_args.setdefault("conversation_id", str(state.get("conversation_id") or "default"))
+
+        return tool_args
 
     def _process_tool_result(self, state: BaseAgentState, tool_name: str, result: Any) -> BaseAgentState:
         metadata = dict(state.get("metadata") or {})
@@ -162,21 +182,25 @@ class OrchestrationAgent(BaseAgent[BaseAgentState]):
             answer = "Khong the tong hop ket qua luc nay."
 
         if state.get("error"):
-            return OrchestrationResponse(
+            response = OrchestrationResponse(
                 answer=f"Khong the xu ly yeu cau. Chi tiet: {state['error']}",
                 intent=intent,
                 route_to=route_to,
                 delegated_results=delegated_results,
                 error=state.get("error"),
             )
+            record_turn(state.get("conversation_id", "default"), state.get("user_query", ""), response.answer, metadata={"agent": "orchestration", "error": state.get("error")})
+            return response
 
-        return OrchestrationResponse(
+        response = OrchestrationResponse(
             answer=answer,
             intent=intent,
             route_to=route_to,
             delegated_results=delegated_results,
             error=None,
         )
+        record_turn(state.get("conversation_id", "default"), state.get("user_query", ""), response.answer, metadata={"agent": "orchestration", "intent": intent.value, "route_to": route_to})
+        return response
 
 
 def build_orchestration_agent(model_name: str = "gpt-4o-mini", temperature: float = 0.0) -> OrchestrationAgent:

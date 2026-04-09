@@ -21,6 +21,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from backend.agent.base_agent import BaseAgent
 from backend.model.agent.base import BaseAgentState
 from backend.model.agent.medicine import MedicineQARequest, MedicineQAResponse
+from backend.utils.short_term_memory import get_short_term_context, record_turn
 
 # Load modules with hyphenated names using importlib
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -116,7 +117,12 @@ class MedicineQAAgent(BaseAgent[BaseAgentState]):
 		"""Add system context to messages"""
 		if messages and getattr(messages[0], "type", "") == "system":
 			return messages
-		return [SystemMessage(content=self._get_agent_prompt())] + messages
+		metadata = dict(state.get("metadata") or {})
+		memory_context = str(metadata.get("memory_context") or "").strip()
+		system_prompt = self._get_agent_prompt()
+		if memory_context:
+			system_prompt = f"{system_prompt}\n\n{memory_context}"
+		return [SystemMessage(content=system_prompt)] + messages
 
 	def _extract_result(self, state: BaseAgentState) -> MedicineQAResponse:
 		"""Extract structured result from final agent state"""
@@ -151,7 +157,7 @@ def build_medicine_qa_agent(model_name: str = "gpt-4o-mini", temperature: float 
 
 
 @traceable(name="ask_medicine_question")
-def ask_medicine_question(question: str) -> MedicineQAResponse:
+def ask_medicine_question(question: str, conversation_id: str = "default", memory_context: str = "") -> MedicineQAResponse:
 	"""
 	Ask a question about medicines/drugs.
 	
@@ -164,9 +170,12 @@ def ask_medicine_question(question: str) -> MedicineQAResponse:
 	request = MedicineQARequest(question=question)
 	try:
 		agent = build_medicine_qa_agent()
-		return agent.process(request.question)
+		effective_memory_context = memory_context or get_short_term_context(conversation_id)
+		response = agent.process(request.question, memory_context=effective_memory_context)
+		record_turn(conversation_id, request.question, response.answer, metadata={"agent": "medicine"})
+		return response
 	except APIConnectionError as exc:
-		return MedicineQAResponse(
+		response = MedicineQAResponse(
 			answer=(
 				"Không thể kết nối đến OpenAI để trả lời hiện tại. "
 				"Hãy kiểm tra kết nối mạng, OPENAI_API_KEY và proxy/firewall. "
@@ -174,11 +183,15 @@ def ask_medicine_question(question: str) -> MedicineQAResponse:
 			),
 			sources=[],
 		)
+		record_turn(conversation_id, request.question, response.answer, metadata={"agent": "medicine", "error": str(exc)})
+		return response
 	except Exception as exc:
-		return MedicineQAResponse(
+		response = MedicineQAResponse(
 			answer=f"Không thể xử lý câu hỏi hiện tại. Chi tiết: {exc}",
 			sources=[],
 		)
+		record_turn(conversation_id, request.question, response.answer, metadata={"agent": "medicine", "error": str(exc)})
+		return response
 
 
 def main() -> None:

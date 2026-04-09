@@ -138,7 +138,7 @@ class BaseAgent(Generic[T], ABC):
                 tool_function = next((t for t in self.tools if t.name == tool_name), None)
 
                 if tool_function:
-                    tool_args = self._preprocess_tool_args(tool_args, state)
+                    tool_args = self._preprocess_tool_args(tool_args, state, tool_name)
                     result = tool_function.invoke(tool_args)
                     tool_messages.append(
                         ToolMessage(content=str(result), tool_call_id=tool_call["id"])
@@ -193,7 +193,7 @@ class BaseAgent(Generic[T], ABC):
         """Update agent-specific state after LLM response - override if needed"""
         return state
     
-    def _preprocess_tool_args(self, tool_args: Dict[str, Any], state: T) -> Dict[str, Any]:
+    def _preprocess_tool_args(self, tool_args: Dict[str, Any], state: T, tool_name: str | None = None) -> Dict[str, Any]:
         """Preprocess tool arguments before execution - override if needed"""
         return tool_args
     
