@@ -20,6 +20,7 @@ if str(CURRENT_DIR) not in sys.path:
 from backend.agent.base_agent import BaseAgent
 from backend.model.agent.base import BaseAgentState
 from backend.model.agent.chat import DiseaseQARequest, DiseaseQAResponse
+from backend.utils.short_term_memory import get_short_term_context, record_turn
 from prompt import SYSTEM_PROMPT
 from tools import retrieve_disease_info
 
@@ -79,7 +80,12 @@ class DiseaseQAAgent(BaseAgent[BaseAgentState]):
     def _add_agent_context(self, messages: List[BaseMessage], state: BaseAgentState) -> List[BaseMessage]:
         if messages and getattr(messages[0], "type", "") == "system":
             return messages
-        return [SystemMessage(content=self._get_agent_prompt())] + messages
+        metadata = dict(state.get("metadata") or {})
+        memory_context = str(metadata.get("memory_context") or "").strip()
+        system_prompt = self._get_agent_prompt()
+        if memory_context:
+            system_prompt = f"{system_prompt}\n\n{memory_context}"
+        return [SystemMessage(content=system_prompt)] + messages
 
     def _extract_result(self, state: BaseAgentState) -> DiseaseQAResponse:
         messages = state.get("messages", [])
@@ -112,13 +118,16 @@ def build_disease_qa_agent(model_name: str = "gpt-4o-mini", temperature: float =
 
 
 @traceable(name="ask_disease_question")
-def ask_disease_question(question: str) -> DiseaseQAResponse:
+def ask_disease_question(question: str, conversation_id: str = "default", memory_context: str = "") -> DiseaseQAResponse:
     request = DiseaseQARequest(question=question)
     try:
         agent = build_disease_qa_agent()
-        return agent.process(request.question)
+        effective_memory_context = memory_context or get_short_term_context(conversation_id)
+        response = agent.process(request.question, memory_context=effective_memory_context)
+        record_turn(conversation_id, request.question, response.answer, metadata={"agent": "chat"})
+        return response
     except APIConnectionError as exc:
-        return DiseaseQAResponse(
+        response = DiseaseQAResponse(
             answer=(
                 "Khong the ket noi den OpenAI de tra loi hien tai. "
                 "Hay kiem tra ket noi mang, OPENAI_API_KEY va proxy/firewall. "
@@ -126,11 +135,15 @@ def ask_disease_question(question: str) -> DiseaseQAResponse:
             ),
             sources=[],
         )
+        record_turn(conversation_id, request.question, response.answer, metadata={"agent": "chat", "error": str(exc)})
+        return response
     except Exception as exc:
-        return DiseaseQAResponse(
+        response = DiseaseQAResponse(
             answer=f"Khong the xu ly cau hoi hien tai. Chi tiet: {exc}",
             sources=[],
         )
+        record_turn(conversation_id, request.question, response.answer, metadata={"agent": "chat", "error": str(exc)})
+        return response
 
 
 def main() -> None:
