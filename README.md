@@ -1,5 +1,16 @@
 # Day5-Hackathon-X2-C401
 
+**Nhóm:** C401-B6
+
+**Thành viên:**
+- Nguyễn Trần Khương An - 2A202600222
+- Trần Vọng Triền - 2A202600320
+- Phương Hoàng Yến - 2A202600284
+- Phạm Minh Việt - 2A202600265
+- Lê Hoàng Minh - 2A202600471
+- Nguyễn Minh Châu - 2A202600197
+
+
 Nền tảng trợ lý y tế đa tác vụ  gồm backend FastAPI và frontend React/Vite. Hệ thống hỗ trợ hỏi đáp sức khỏe, tra cứu thuốc, tìm bác sĩ theo bệnh/triệu chứng và đặt lịch khám.
 
 ## Tính năng chính
