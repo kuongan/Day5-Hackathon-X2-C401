@@ -84,6 +84,23 @@ Vi du:
 """.strip()
 
 
+AGGREGATOR_SYSTEM_PROMPT = """
+Ban la bo phan tong hop ket qua tu nhieu delegated agents trong he thong tro ly y te.
+
+Nhiem vu:
+- Doc cau hoi user, intent, route_to va danh sach delegated_results.
+- Tong hop thanh 1 cau tra loi cuoi cung ro rang, ngan gon, huu ich.
+
+Quy tac:
+- Uu tien thong tin tu cac agent success=true va answer khong rong.
+- Neu co loi tu mot so agent, van tra loi duoc phan thong tin kha dung va nhac ngan gon phan loi.
+- Khong bịa them du lieu ngoai delegated_results.
+- Neu co sources, uu tien trich dan nguon ro rang o cuoi cau tra loi.
+- Neu tat ca deu that bai hoac khong co noi dung huu ich, tra loi lich su va de nghi user cung cap them thong tin.
+- Cau tra loi bang tieng Viet, than thien, khong qua dai dong.
+""".strip()
+
+
 def _build_structured_llm():
     return get_llm(model_name="gpt-4o-mini", temperature=0.0)
 
@@ -286,14 +303,54 @@ def aggregate_results(
         )
         return output.model_dump_json(ensure_ascii=False)
 
+    delegated_payload = [
+        item.model_dump() if isinstance(item, DelegatedAgentCallResult) else item
+        for item in delegated_results
+    ]
+    all_sources: List[str] = []
+    seen_sources = set()
+    for item in delegated_results:
+        if not item.success:
+            continue
+        for src in item.sources or []:
+            src_text = str(src).strip()
+            if src_text and src_text not in seen_sources:
+                seen_sources.add(src_text)
+                all_sources.append(src_text)
+
+    extra_context = (
+        f"Intent: {intent.value}\n"
+        f"Route to: {json.dumps(route_to, ensure_ascii=False)}\n"
+        f"Delegated results (JSON):\n{json.dumps(delegated_payload, ensure_ascii=False, indent=2)}"
+    )
+
+    try:
+        result = _safe_structured_invoke(
+            AGGREGATOR_SYSTEM_PROMPT,
+            AggregateResultsOutput,
+            user_query=query,
+            extra_context=extra_context,
+        )
+        if isinstance(result, AggregateResultsOutput) and result.answer.strip():
+            final_answer = result.answer.strip()
+            if all_sources:
+                final_answer = (
+                    f"{final_answer}\n\nNguon tham khao:\n"
+                    + "\n".join(f"- {src}" for src in all_sources)
+                )
+            return AggregateResultsOutput(answer=final_answer).model_dump_json(ensure_ascii=False)
+    except Exception:
+        pass
+
     successful = [res for res in delegated_results if res.success and res.answer.strip()]
     failed = [res for res in delegated_results if not res.success]
-
     lines: List[str] = []
 
     if successful:
         for item in successful:
             lines.append(f"- [{item.agent}] {item.answer}")
+    else:
+        lines.append("Minh chua tong hop duoc noi dung tra loi ro rang tu cac agent.")
 
     if failed:
         lines.append("Luu y loi:")
@@ -301,8 +358,11 @@ def aggregate_results(
             err = item.error or "unknown error"
             lines.append(f"- [{item.agent}] {err}")
 
-    final_answer = "\n".join(lines)
-    output = AggregateResultsOutput(answer=final_answer)
+    if all_sources:
+        lines.append("Nguon tham khao:")
+        lines.extend(f"- {src}" for src in all_sources)
+
+    output = AggregateResultsOutput(answer="\n".join(lines).strip())
     return output.model_dump_json(ensure_ascii=False)
 
 
