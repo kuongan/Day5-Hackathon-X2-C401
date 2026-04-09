@@ -3,11 +3,31 @@ from __future__ import annotations
 import os
 import threading
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Optional
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from dotenv import load_dotenv
-load_dotenv()
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def load_environment(override: bool = False) -> None:
+    """Load environment variables from common project locations."""
+    candidate_env_files = [
+        PROJECT_ROOT / ".env",
+        PROJECT_ROOT / "backend" / ".env",
+    ]
+    for env_file in candidate_env_files:
+        if env_file.exists():
+            load_dotenv(dotenv_path=env_file, override=override)
+
+    # Fallback to default dotenv discovery behavior.
+    load_dotenv(override=override)
+
+
+load_environment()
 
 
 def _configure_langsmith_from_env() -> None:
@@ -79,6 +99,7 @@ _rotator_lock = threading.Lock()
 
 def refresh_api_key_pool() -> None:
     """Reload API keys from environment for runtime updates."""
+    load_environment(override=True)
     global _rotator
     with _rotator_lock:
         _rotator = _APIKeyRotator(keys=_load_keys_from_env())
