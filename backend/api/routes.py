@@ -77,11 +77,13 @@ def ask_booking(request: AgentQuestionRequest) -> BookingResponse:
             question=request.question,
             conversation_id=request.conversation_id,
         )
-        payload = dict(getattr(result, "__dict__", {}))
+        payload = result.model_dump()
         return BookingResponse(
             success=bool(payload.get("success", False)),
+            answer=payload.get("answer"),
             error=payload.get("error"),
             appointment_id=payload.get("appointment_id"),
+            appointment_details=payload.get("appointment_details"),
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Booking agent failed: {exc}") from exc

@@ -148,7 +148,7 @@ def ask_booking_question(question: str, conversation_id: str = "default") -> Boo
 
 
 if __name__ == "__main__":
-    sample_query = "Toi muon dat lich kham voi bac si Do Tat Cuong vao ngay 2026-04-08 luc 08:00"
+    sample_query = "Toi muon dat lich kham voi bac si Do Tat Cuong vao ngay 2026-04-09 luc 08:00"
     response = ask_booking_question(sample_query, conversation_id="booking_test")
     print("User:", sample_query)
     print("Assistant:", response.answer)
