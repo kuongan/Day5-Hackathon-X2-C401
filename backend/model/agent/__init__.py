@@ -6,6 +6,10 @@ from .chat import (
 	DiseaseRetrievalResult,
 	RetrieveDiseaseInput,
 )
+from .medicine import (
+	MedicineQARequest,
+	MedicineQAResponse,
+)
 
 __all__ = [
 	"BaseAgentResult",
@@ -15,4 +19,6 @@ __all__ = [
 	"DiseaseQAResponse",
 	"DiseaseRetrievalResult",
 	"RetrieveDiseaseInput",
+	"MedicineQARequest",
+	"MedicineQAResponse",
 ]
