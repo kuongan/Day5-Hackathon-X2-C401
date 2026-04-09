@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -124,9 +126,31 @@ function formatResponse(mode, payload) {
   };
 }
 
+function getSourceHref(source) {
+  if (typeof source !== "string") return "";
+  const trimmed = source.trim();
+  if (!trimmed) return "";
+  return /^https?:\/\//i.test(trimmed) ? trimmed : "";
+}
+
+function toDisplayText(value) {
+  if (typeof value === "string") return value;
+  if (value === null || value === undefined) return "";
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
+}
+
 export default function App() {
   const [agent, setAgent] = useState("orchestration");
   const [conversationId, setConversationId] = useState("default");
+  const [userName, setUserName] = useState("Nguyen Van A");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState(() => [
     {
@@ -237,101 +261,135 @@ export default function App() {
     }
   };
 
+  const createNewChat = () => {
+    if (!activeAgent) return;
+    const newConversationId = `chat-${Date.now()}`;
+    setConversationId(newConversationId);
+    setMessages([
+      buildAgentIntro(activeAgent.id, activeAgent.label, activeAgent.description)
+    ]);
+    setInput("");
+    setError("");
+    setLoading(false);
+    scrollToBottom();
+  };
+
   return (
-    <div className="min-h-screen">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-10 pt-10 lg:flex-row">
-        <section className="w-full max-w-xl space-y-6">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-panel">
-            <p className="font-display text-sm uppercase tracking-[0.3em] text-glow/70">
-              Medical Assistant
+    <div className="min-h-screen bg-slate-50 text-slate-800">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col gap-4 p-3 md:p-4 lg:flex-row">
+        <aside className="w-full rounded-3xl border border-sky-100 bg-white/90 p-4 shadow-panel backdrop-blur-sm lg:w-[320px] lg:p-5">
+          <div className="rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-500 p-4 text-white">
+            <p className="font-display text-xs uppercase tracking-[0.22em] text-white/80">
+              Vinuni Health
             </p>
-            <h1 className="mt-3 font-display text-3xl font-semibold text-white md:text-4xl">
-              Chatbot hỗ trợ tra cứu bệnh lý, thuốc và đặt lịch.
+            <h1 className="mt-2 font-display text-xl font-semibold leading-tight">
+              Medical Assistant
             </h1>
-            <p className="mt-3 text-base text-mist/80">
-              Chọn agent phù hợp, nhập câu hỏi và theo dõi phản hồi theo thời gian thực.
+            <p className="mt-2 text-sm text-cyan-50/90">
+              Hỗ trợ hỏi đáp bệnh lý, tra cứu thuốc và đặt lịch khám.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-float">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg text-white">Cấu hình</h2>
-              <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-mist/70">
-                API: {API_BASE}
-              </span>
+          <div className="mt-4 space-y-4">
+            <button
+              type="button"
+              onClick={createNewChat}
+              className="w-full rounded-2xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
+            >
+              + Tạo chat mới
+            </button>
+
+            <div className="rounded-2xl border border-sky-100 bg-sky-50/60 p-4">
+              <h2 className="font-display text-sm font-semibold text-slate-800">
+                User Settings
+              </h2>
+              <div className="mt-3 space-y-3">
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.16em] text-slate-500">
+                    Tên hiển thị
+                  </label>
+                  <input
+                    value={userName}
+                    onChange={(event) => setUserName(event.target.value)}
+                    className="mt-2 w-full rounded-xl border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-400"
+                    placeholder="Nguyen Van A"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.16em] text-slate-500" htmlFor="conversationId">
+                    Conversation ID
+                  </label>
+                  <input
+                    id="conversationId"
+                    value={conversationId}
+                    onChange={(event) => setConversationId(event.target.value)}
+                    className="mt-2 w-full rounded-xl border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-400"
+                    placeholder="default"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="mt-4 space-y-4">
-              <label className="block text-sm text-mist/70">Chọn agent</label>
-              <div className="grid gap-3">
-                {AGENTS.map((item) => (
+
+            <div className="rounded-2xl border border-sky-100 bg-white p-4">
+              <h3 className="font-display text-sm font-semibold text-slate-800">
+                Gợi ý nhanh
+              </h3>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {QUICK_PROMPTS.map((prompt) => (
                   <button
-                    key={item.id}
+                    key={prompt}
                     type="button"
-                    onClick={() => setAgent(item.id)}
-                    className={`rounded-2xl border px-4 py-3 text-left transition ${
-                      agent === item.id
-                        ? "border-glow/60 bg-white/10 text-white"
-                        : "border-white/10 bg-white/5 text-mist/70 hover:border-glow/40"
-                    }`}
+                    onClick={() => sendMessage(prompt)}
+                    className="rounded-full border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-700 transition hover:border-sky-400 hover:bg-sky-100"
                   >
-                    <div className="font-display text-sm font-semibold">
-                      {item.label}
-                    </div>
-                    <p className="mt-1 text-xs text-mist/70">{item.description}</p>
+                    {prompt}
                   </button>
                 ))}
               </div>
-
-              <div>
-                <label className="block text-sm text-mist/70" htmlFor="conversationId">
-                  Conversation ID
-                </label>
-                <input
-                  id="conversationId"
-                  value={conversationId}
-                  onChange={(event) => setConversationId(event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none ring-0 focus:border-glow/60"
-                  placeholder="default"
-                />
-              </div>
             </div>
           </div>
+        </aside>
 
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <h3 className="font-display text-sm uppercase tracking-[0.3em] text-glow/70">
-              Gợi ý nhanh
-            </h3>
+        <section className="flex h-[calc(100vh-1.5rem)] min-h-0 w-full flex-1 flex-col overflow-hidden rounded-3xl border border-sky-100 bg-white/90 shadow-panel backdrop-blur-sm md:h-[calc(100vh-2rem)]">
+          <header className="border-b border-sky-100 bg-white px-4 py-4 md:px-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Phòng khám trực tuyến</p>
+                <h2 className="font-display text-xl font-semibold text-slate-800">
+                  Xin chào, {userName || "bạn"}
+                </h2>
+              </div>
+              <div className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs text-sky-700">
+                API: {API_BASE}
+              </div>
+            </div>
+
             <div className="mt-4 flex flex-wrap gap-2">
-              {QUICK_PROMPTS.map((prompt) => (
+              {AGENTS.map((item) => (
                 <button
-                  key={prompt}
+                  key={item.id}
                   type="button"
-                  onClick={() => sendMessage(prompt)}
-                  className="rounded-full border border-white/10 px-4 py-2 text-xs text-mist/80 transition hover:border-glow/50 hover:text-white"
+                  onClick={() => setAgent(item.id)}
+                  className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
+                    agent === item.id
+                      ? "border-sky-600 bg-sky-600 text-white"
+                      : "border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400 hover:bg-sky-100"
+                  }`}
                 >
-                  {prompt}
+                  {item.label}
                 </button>
               ))}
             </div>
-          </div>
-        </section>
 
-        <section className="flex min-h-[600px] w-full flex-1 flex-col rounded-3xl border border-white/10 bg-white/5 shadow-panel">
-          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-glow/70">Chat</p>
-              <h2 className="font-display text-xl text-white">
-                {activeAgent?.label || "Agent"}
-              </h2>
-            </div>
-            <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-mist/70">
+            <p className="mt-3 text-sm text-slate-600">
               {activeAgent?.description}
-            </div>
+            </p>
           </header>
 
           <div
             ref={listRef}
-            className="flex-1 space-y-4 overflow-y-auto px-6 py-6"
+            className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-gradient-to-b from-white to-sky-50/70 px-4 py-5 md:px-6"
           >
             {messages.map((message) => (
               <div
@@ -341,83 +399,107 @@ export default function App() {
                 }`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-float ${
+                  className={`max-w-[88%] rounded-2xl border px-5 py-4 text-base leading-7 shadow-float md:max-w-[80%] ${
                     message.role === "user"
-                      ? "bg-tide text-white"
-                      : "bg-white/10 text-mist"
+                      ? "border-sky-600 bg-sky-600 text-white"
+                      : "border-sky-100 bg-white text-slate-700"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  {message.role === "assistant" ? (
+                    <div className="markdown-content">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          a: ({ ...props }) => (
+                            <a
+                              {...props}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline decoration-sky-400 underline-offset-2 hover:text-sky-900"
+                            />
+                          )
+                        }}
+                      >
+                        {toDisplayText(message.content)}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{toDisplayText(message.content)}</p>
+                  )}
+
                   {message.meta?.type === "qa" && message.meta.sources?.length ? (
-                    <div className="mt-3 space-y-1 border-t border-white/10 pt-3 text-xs text-glow/80">
+                    <div className="mt-3 space-y-1 border-t border-sky-100 pt-3 text-xs text-sky-700">
                       <p className="font-semibold">Nguồn tham khảo</p>
-                      {message.meta.sources.map((source, idx) => (
-                        <div key={`${source}-${idx}`} className="truncate">
-                          {source}
-                        </div>
-                      ))}
+                      {message.meta.sources.map((source, idx) => {
+                        const sourceText = toDisplayText(source);
+                        const href = getSourceHref(sourceText);
+                        return (
+                          <div key={`source-${idx}`} className="truncate">
+                            {href ? (
+                              <a
+                                href={href}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="underline decoration-sky-400 underline-offset-2 hover:text-sky-900"
+                              >
+                                {sourceText}
+                              </a>
+                            ) : (
+                              <span>{sourceText}</span>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : null}
+
                   {message.meta?.type === "orchestration" && message.meta.details?.length ? (
-                    <div className="mt-3 space-y-1 border-t border-white/10 pt-3 text-xs text-glow/80">
+                    <div className="mt-3 space-y-1 border-t border-sky-100 pt-3 text-xs text-sky-700">
                       {message.meta.details.map((detail) => (
                         <div key={detail}>{detail}</div>
                       ))}
                     </div>
                   ) : null}
-                  {message.meta?.type === "orchestration" && message.meta.delegated?.length ? (
-                    <div className="mt-3 space-y-2 border-t border-white/10 pt-3 text-xs text-mist/80">
-                      <p className="font-semibold text-glow/80">Kết quả delegate</p>
-                      {message.meta.delegated.map((item, idx) => (
-                        <div key={`${item.agent}-${idx}`} className="rounded-xl bg-white/5 px-3 py-2">
-                          <div className="font-semibold text-white/80">
-                            {item.agent}
-                          </div>
-                          <div className="mt-1 whitespace-pre-wrap">{item.answer}</div>
-                          {item.error ? (
-                            <div className="mt-1 text-ember">Error: {item.error}</div>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
+
                 </div>
               </div>
             ))}
+
             {loading ? (
               <div className="flex justify-start">
-                <div className="rounded-2xl bg-white/10 px-4 py-3 text-sm text-mist">
+                <div className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm text-slate-600">
                   Đang xử lý...
                 </div>
               </div>
             ) : null}
           </div>
 
-          <form onSubmit={onSubmit} className="border-t border-white/10 p-4">
+          <form onSubmit={onSubmit} className="border-t border-sky-100 bg-white p-4 md:p-5">
             <div className="flex flex-col gap-3 md:flex-row md:items-end">
               <div className="flex-1">
-                <label className="block text-xs uppercase tracking-[0.3em] text-glow/70">
+                <label className="block text-xs uppercase tracking-[0.2em] text-slate-500">
                   Tin nhắn
                 </label>
                 <textarea
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   onKeyDown={onKeyDown}
-                  rows={3}
+                  rows={4}
                   placeholder="Nhập câu hỏi của bạn..."
-                  className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-glow/60"
+                  className="mt-2 w-full resize-none rounded-2xl border border-sky-200 bg-slate-50 px-4 py-3 text-base leading-7 text-slate-700 outline-none transition focus:border-sky-500"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-2xl bg-ember px-6 py-3 text-sm font-semibold text-ink transition hover:bg-[#ffd28c] disabled:cursor-not-allowed disabled:opacity-70"
+                className="rounded-2xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 Gửi
               </button>
             </div>
+
             {error ? (
-              <p className="mt-3 text-xs text-ember">{error}</p>
+              <p className="mt-3 text-xs text-red-600">{error}</p>
             ) : null}
           </form>
         </section>
