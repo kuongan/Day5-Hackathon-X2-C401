@@ -152,37 +152,35 @@ def retrieve_disease_info(query: str, top_k: int = 3) -> str:
 			warning=f"Retrieval failed: {exc}",
 		)
 		return result.model_dump_json(ensure_ascii=False)
+	
 if __name__ == "__main__":
     print("--- Đang bắt đầu test Tool: retrieve_disease_info ---")
     
     # 1. Định nghĩa câu hỏi test (Query)
     test_query = "Triệu chứng bệnh sốt xuất huyết là gì?"
     
-    try:
-        # 2. Gọi hàm tool trực tiếp
-        # Lưu ý: Tool của LangChain khi gọi trực tiếp sẽ chạy như một hàm Python bình thường
-        result_json = retrieve_disease_info(query=test_query, top_k=3)
+    result_json = retrieve_disease_info.invoke({
+        "query": test_query,
+        "top_k": 3
+    })
+    
+    # 3. Parse kết quả để hiển thị đẹp mắt
+    result_data = json.loads(result_json)
+    
+    print(f"\n[QUERY]: {result_data.get('query')}")
+    print(f"[TOTAL HITS]: {result_data.get('total_hits')}")
+    
+    if result_data.get('warning'):
+        print(f"[WARNING]: {result_data.get('warning')}")
         
-        # 3. Parse kết quả để hiển thị đẹp mắt
-        result_data = json.loads(result_json)
-        
-        print(f"\n[QUERY]: {result_data.get('query')}")
-        print(f"[TOTAL HITS]: {result_data.get('total_hits')}")
-        
-        if result_data.get('warning'):
-            print(f"[WARNING]: {result_data.get('warning')}")
-            
-        if result_data.get('articles'):
-            print("\n[DANH SÁCH BỆNH TÌM THẤY]:")
-            for i, article in enumerate(result_data['articles'], 1):
-                print(f"--- Kết quả {i} ---")
-                print(f"ID: {article['disease_id']}")
-                print(f"Tên bệnh: {article['title']}")
-                print(f"Score: {article['score']:.4f}")
-                print(f"URL: {article['source_url']}")
-                print(f"Tóm tắt: {article['summary'][:100]}...") # In 100 ký tự đầu
-        else:
-            print("\n❌ Không tìm thấy bài viết nào khớp với câu hỏi.")
-
-    except Exception as e:
-        print(f"\n❌ Lỗi hệ thống khi chạy test: {e}")
+    if result_data.get('articles'):
+        print("\n[DANH SÁCH BỆNH TÌM THẤY]:")
+        for i, article in enumerate(result_data['articles'], 1):
+            print(f"--- Kết quả {i} ---")
+            print(f"ID: {article['disease_id']}")
+            print(f"Tên bệnh: {article['title']}")
+            print(f"Score: {article['score']:.4f}")
+            print(f"URL: {article['source_url']}")
+            print(f"Tóm tắt: {article['summary'][:100]}...")
+    else:
+        print("\n❌ Không tìm thấy bài viết nào khớp với câu hỏi.")
